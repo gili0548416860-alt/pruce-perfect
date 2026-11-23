@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מחולל החוזים של פרפקט</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@200;300;400;500;700;900&display=swap">
+<style id="appstyle">
+:root{
+  --bg:#f2f2ef; --surface:#ffffff; --surface2:#f6f6f3; --ink:#141010; --muted:#68645e; --line:#dad9d3;
+  --accent:#ffe800; --on-accent:#141010; --bar:#141010; --on-bar:#ffffff; --ok:#1f7a3a; --bad:#b3261e; --focus:#141010;
+  --f:'Heebo','Segoe UI',Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.5;direction:rtl}
+[hidden]{display:none!important}
+.wrap{max-width:1320px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{position:sticky;top:0;z-index:20;background:var(--bar);color:var(--on-bar);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;align-items:baseline;gap:12px}
+.wm{font-family:var(--f);font-weight:200;font-size:30px;letter-spacing:.5px;direction:ltr;position:relative;padding-bottom:5px}
+.wm::after{content:"";position:absolute;left:2px;bottom:0;width:15px;height:3px;background:var(--accent)}
+.brand .sub{font-size:13px;opacity:.75}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-inline-start:auto}
+.tabs button{background:none;border:0;color:var(--on-bar);font:inherit;font-size:14px;padding:8px 14px;cursor:pointer;opacity:.7;border-bottom:3px solid transparent}
+.tabs button[aria-selected="true"]{opacity:1;border-bottom-color:var(--accent);font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+main{padding-block:22px 60px}
+h2{font-size:22px;font-weight:700;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 18px;max-width:62ch}
+.shell{display:grid;grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:26px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);padding:18px;margin-bottom:16px}
+.card h3{font-size:15px;font-weight:700;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.card h3 i{font-style:normal;background:var(--accent);color:var(--on-accent);min-width:24px;height:24px;display:inline-grid;place-items:center;font-size:13px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{background:var(--surface2);color:var(--ink);border:1px solid var(--line);font:inherit;font-size:14px;padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+label.f.w2{grid-column:1/-1}
+input[type=text],input[type=number],input[type=date],input[type=tel],input[type=email],textarea,select{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);padding:8px 10px;min-width:0}
+textarea{min-height:70px;resize:vertical}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--ink);flex:none}
+.grp{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin:14px 0 4px}
+.svc{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.svc .nm{font-weight:500;min-width:0}
+.svc .ds{grid-column:2/-1;font-size:12px;color:var(--muted);white-space:pre-line}
+.svc .nums{display:flex;gap:6px;align-items:center}
+.svc .nums input{width:84px;text-align:left;direction:ltr}
+.svc .nums input.q{width:56px}
+.svc.off .nm{opacity:.55}
+.sum{background:var(--bar);color:var(--on-bar);padding:14px 16px;margin-top:12px}
+.sum .r{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:14px}
+.sum .r.t{font-size:20px;font-weight:900;border-top:1px solid #ffffff40;margin-top:6px;padding-top:8px}
+.sum .r.t b{color:var(--accent)}
+.sum .r span:last-child{direction:ltr;font-variant-numeric:tabular-nums}
+.btn{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--ink);background:var(--surface);color:var(--ink);padding:9px 14px;cursor:pointer}
+.btn.pri{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.sm{padding:5px 10px;font-size:13px;font-weight:500}
+.btn.bad{color:var(--bad);border-color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pvbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.pv{overflow:hidden;background:#8c8a84;padding:0}
+.pv-sizer{position:relative}
+.pv-inner{width:794px;transform-origin:top right;position:absolute;top:0;right:0}
+.pvcol{position:sticky;top:74px;max-height:calc(100vh - 90px);overflow-y:auto;overscroll-behavior:contain}
+.mview{display:none;gap:6px;margin-bottom:14px}
+.cl{border-top:1px solid var(--line);padding:10px 0;display:grid;gap:6px}
+.cl .hd{display:flex;gap:8px;align-items:center}
+.cl .hd input[type=text]{font-weight:700}
+.tbl{width:100%;border-collapse:collapse}
+.tbl td,.tbl th{border-top:1px solid var(--line);padding:9px 8px;text-align:right;vertical-align:middle}
+.empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line)}
+#toast{position:fixed;inset:auto 0 calc(20px + env(safe-area-inset-bottom,0px)) 0;display:flex;justify-content:center;pointer-events:none;z-index:40}
+#toast span{background:var(--ink);color:var(--surface);padding:9px 16px;font-size:14px;opacity:0;transition:opacity .2s}
+#toast.on span{opacity:1}
+.note{font-size:12px;color:var(--muted);margin-top:6px}
+.scroll-x{overflow-x:auto}
+@media (max-width:960px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .mview{display:flex}
+  .pvcol{position:static;max-height:none;overflow:visible}
+  .shell .pvcol{display:none}
+  .shell.show-pv .form{display:none}
+  .shell.show-pv .pvcol{display:block}
+  .tabs{margin-inline-start:0;width:100%;overflow-x:auto;flex-wrap:nowrap}
+}
+@media print{
+  body{background:#fff!important}
+  .top,main>.tab>h2,main>.tab>.lead,.mview,.form,.pvbar,#pvStatus,#toast{display:none!important}
+  main,.wrap,.shell,.pvcol,.pv,.pv-sizer,.pv-inner{
+    display:block!important;position:static!important;width:100%!important;height:auto!important;
+    max-height:none!important;margin:0!important;padding:0!important;border:0!important;
+    background:#fff!important;transform:none!important;overflow:visible!important;
+  }
+  .paper{margin:0 auto!important;box-shadow:none!important}
+  @page{size:A4;margin:0}
+}
+</style>
+<style id="docstyle">
+.paper,.paper *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.paper{width:794px;min-height:1123px;background:#fff;color:#141010;font-family:'Heebo','Segoe UI',Arial,sans-serif;direction:rtl;padding:26px 26px 22px;font-size:14px;line-height:1.55}
+.paper .d-head{background:#141010;color:#fff;height:290px;position:relative;overflow:hidden}
+.paper .d-wm{position:absolute;left:88px;bottom:26px;transform-origin:0 100%;transform:rotate(-90deg);font-weight:200;font-size:58px;line-height:1;direction:ltr;white-space:nowrap}
+.paper .d-bar{position:absolute;left:104px;bottom:36px;width:5px;height:34px;background:#ffe800}
+.paper .d-bsd{position:absolute;top:20px;right:34px;font-size:11px;font-weight:300}
+.paper .d-to{position:absolute;right:34px;left:190px;bottom:26px;text-align:right}
+.paper .d-to .who{font-size:15px;margin-bottom:10px}
+.paper .d-to .who b{font-weight:700}
+.paper .d-to .ld{font-size:16px;font-weight:300;line-height:1.45}
+.paper .d-to .ld b{color:#ffe800;font-weight:700}
+.paper .d-to .ld u{text-decoration-color:#ffe800;text-underline-offset:4px}
+.paper .d-ttl{text-align:center;font-weight:700;font-size:15px;margin:28px 0 22px;line-height:1.45}
+.paper .d-boxw{position:relative;padding:0 26px;margin-bottom:22px}
+.paper .d-box{border:1.5px solid #141010;padding:30px 36px 28px 40px;min-height:300px;position:relative;z-index:1}
+.paper .d-tab{position:absolute;right:0;width:52px;height:116px;top:34px;background:#141010;color:#fff;font-weight:900;font-size:16px;overflow:hidden;z-index:3}
+.paper .d-tab span{position:absolute;left:50%;top:50%;white-space:nowrap;transform:translate(-50%,-50%) rotate(90deg)}
+.paper .d-tab em{font-style:normal;color:#ffe800}
+.paper .d-tab2{z-index:3;position:absolute;right:0;top:160px;width:56px;font-size:10px!important;background:#ffe800;color:#141010;line-height:1.3;text-align:center;padding:10px 4px;font-weight:500}
+.paper .d-tab2 b{display:block;font-size:12px;font-weight:900;white-space:nowrap;direction:ltr}
+.paper .d-row{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px dotted #bdbab2;break-inside:avoid}
+.paper .d-row:first-child{padding-top:0}
+.paper .d-nm{font-weight:700;font-size:15px}
+.paper .d-ds{font-size:13px;color:#3d3935;white-space:pre-line;margin-top:2px}
+.paper .d-amt{font-weight:700;white-space:nowrap;direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.paper .d-amt small{display:block;font-weight:400;font-size:11px;color:#68645e}
+.paper .d-gift .d-amt span{background:#ffe800;padding:1px 7px}
+.paper .d-sum{margin-top:14px;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.paper .d-sum div{display:flex;gap:18px;justify-content:space-between;width:300px;font-size:14px}
+.paper .d-sum div span:last-child{direction:ltr;font-variant-numeric:tabular-nums}
+.paper .d-sum .tt{font-size:19px;font-weight:900;border-top:2px solid #141010;padding-top:6px;margin-top:4px}
+.paper .d-sum .tt span:last-child{background:#ffe800;padding:0 8px}
+.paper .d-note{margin-top:14px;font-size:13px;color:#3d3935;white-space:pre-line}
+.paper .d-sign{margin-top:22px;text-align:right;line-height:1.7}
+.paper .d-sign b{font-weight:900}
+.paper .d-intro{text-align:center;font-weight:700;margin:26px 0 18px;font-size:14px}
+.paper .d-cl{margin:0 0 13px;break-inside:avoid}
+.paper .d-cl b{font-weight:900}
+.paper .d-gl{margin-top:28px;font-weight:900}
+.paper .d-sg{display:grid;grid-template-columns:1fr 1fr;gap:22px 28px;margin-top:20px}
+.paper .d-sg div{display:flex;gap:8px;align-items:flex-end;font-weight:900;break-inside:avoid}
+.paper .d-sg div span{flex:1;border-bottom:1px solid #141010;min-height:22px;font-weight:400;padding:0 4px}
+.paper .d-tag{text-align:center;color:#68645e;margin:26px 0 14px;font-size:13px;line-height:1.6}
+.paper .d-foot{background:#141010;color:#fff;display:flex;align-items:center;gap:26px;padding:16px 26px;break-inside:avoid}
+.paper .d-foot .lg{font-weight:200;font-size:44px;line-height:1;direction:ltr;position:relative;padding-bottom:5px}
+.paper .d-foot .lg::after{content:"";position:absolute;left:3px;bottom:0;width:20px;height:3px;background:#ffe800}
+.paper .d-foot .ph{direction:ltr;text-align:center;border-inline:1px dashed #ffffff66;padding:0 22px}
+.paper .d-foot .ph b{display:block;font-size:22px;font-weight:900;letter-spacing:1px}
+.paper .d-foot .ph small{font-size:11px;letter-spacing:1px}
+.paper .d-foot .ct{white-space:pre-line;line-height:1.5;font-size:13px;font-weight:300;flex:1;text-align:right}
+.paper .d-foot .ct b{color:#ffe800;font-weight:700}
+.paper .d-bank{border:1px solid #141010;margin-top:10px;text-align:center;font-size:12px;color:#3d3935;padding:6px}
+</style>
+<style id="docstyle2">
+.paper .d-tbl{width:100%;border-collapse:collapse;margin-bottom:6px}
+.paper .d-tbl th{background:#ffe800;font-weight:700;font-size:14px;padding:7px 10px;text-align:right}
+.paper .d-tbl td{padding:14px 10px;vertical-align:top;border-bottom:1px solid #141010;font-size:13px;line-height:1.55;break-inside:avoid}
+.paper .d-tbl td.n{font-weight:900;font-size:14px;width:26%}
+.paper .d-tbl td.a{width:20%;font-weight:700;direction:ltr;text-align:left;white-space:nowrap}
+.paper .d-tbl td.a small{display:block;font-weight:400;font-size:11px;color:#68645e}
+.paper .d-tbl tr.gift td{background:#fffbd0}
+.paper .d-inc{list-style:none;margin:0;padding:0}
+.paper .d-inc>li{margin:0 0 10px;padding-inline-start:16px;position:relative;font-size:14px}
+.paper .d-inc>li::before{content:"-";position:absolute;right:0}
+.paper .d-inc ul{list-style:none;margin:2px 0 0;padding:0;font-size:13px;color:#3d3935}
+.paper .d-inc ul li{padding-inline-start:12px;position:relative}
+.paper .d-inc ul li::before{content:"·";position:absolute;right:0}
+.paper .d-tiers{display:flex;gap:12px;align-items:stretch}
+.paper .d-tier{flex:1;min-width:0;border:1.5px solid #141010;padding:16px 12px 14px;position:relative;display:flex;flex-direction:column;gap:10px;break-inside:avoid}
+.paper .d-tier.rec{background:#141010;color:#fff}
+.paper .d-tier .rb{position:absolute;top:-11px;right:12px;background:#ffe800;color:#141010;font-size:11px;font-weight:900;padding:1px 10px}
+.paper .d-tier .tn{font-weight:900;font-size:17px}
+.paper .d-tier ul{margin:0;padding:0;list-style:none;font-size:12.5px;line-height:1.45;flex:1}
+.paper .d-tier li{padding:4px 0;border-top:1px dotted #8c8a84}
+.paper .d-tier.rec li{border-top-color:#ffffff55}
+.paper .d-tier .tp{font-weight:900;font-size:19px;direction:ltr;text-align:right}
+.paper .d-tier.rec .tp{color:#ffe800}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brand"><span class="wm">Perfect</span><span class="sub">מחולל חוזים והצעות מחיר</span></div>
+  <nav class="tabs" id="tabs" role="tablist">
+    <button role="tab" data-tab="doc" aria-selected="true">מסמך חדש</button>
+    <button role="tab" data-tab="saved" aria-selected="false">הלקוחות שלי</button>
+    <button role="tab" data-tab="prices" aria-selected="false">מחירון</button>
+    <button role="tab" data-tab="terms" aria-selected="false">תקנון</button>
+    <button role="tab" data-tab="studio" aria-selected="false">פרטי הסטודיו</button>
+  </nav>
+</div></header>
+<main class="wrap">
+  <section class="tab" id="tab-doc">
+    <h2>מסמך חדש</h2>
+    <p class="lead">בוחרים תבנית, ממלאים פרטי לקוח וקטגוריה לכותרת, מסמנים שירותים. החוזה וההצעה נבנים לבד, עם המחירון והתקנון שלך.</p>
+    <div class="mview" id="mview"><button class="btn pri" data-v="edit">עריכה</button><button class="btn" data-v="view">תצוגה מקדימה</button></div>
+    <div class="shell" id="shell">
+      <div class="form" id="form"></div>
+      <div class="pvcol">
+        <div class="pvbar" id="pvbar"></div>
+        <div class="note" id="pvStatus" role="status" style="margin:-4px 0 10px;min-height:18px"></div>
+        <div class="pv" id="pv"><div class="pv-sizer" id="pvSizer"><div class="pv-inner" id="pvInner"></div></div></div>
+      </div>
+    </div>
+  </section>
+  <section class="tab" id="tab-saved" hidden></section>
+  <section class="tab" id="tab-prices" hidden></section>
+  <section class="tab" id="tab-terms" hidden></section>
+  <section class="tab" id="tab-studio" hidden></section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<div id="toast" role="status" aria-live="polite"><span></span></div>
+
+<script>
+const DEFAULTS = {
+  studio: {
+    name: 'Perfect', hebName: 'פרפקט', owner: 'גילה שנור',
+    phone: '054.841.6860', email: 'gili0548416860@gmail.com',
+    bank: 'בנק: 20 | סניף: 468 | חשבון: 288050 | ע"ש: גילה שנור',
+    tag1: 'עיצוב טוב הוא לא רק ציור – הוא זהות.',
+    tag2: 'עיצוב מדויק מספר סיפור, יוצר רושם, ונשאר בזיכרון.',
+    cta: 'אשמח לעמוד לשרותך,\nולהתאים עבורך את החבילה המתאימה לך ביותר,',
+    ctaEm: 'להשתמע:)'
+  },
+  params: { advance: 30, sketches: 2, rounds: 2, hourly: 150, cancel: 30, validity: 2, vatRate: 18 },
+  ver: 3,
+  services: [
+    { id: 'm0', cat: 'מיתוג', name: 'לוגו מקצועי', price: 2600, qty: false, bonus: false,
+      desc: 'לוגו: 2 סקיצות + 2 סבבי תיקונים\nגרסאות: שחור לבן, צבעוני, אופקי ואנכי' },
+    { id: 'm1', cat: 'מיתוג', name: 'חבילת מיתוג בסיסית', price: 3400, qty: false, bonus: false,
+      desc: 'אפיון קצר על בסיס שאלון ושיחה טלפונית / פגישה בזום\nלוגו מקצועי: 2 סקיצות + 2 סבבי תיקונים\nגרסאות נוספות: לוגו שחור לבן, צבעוני, אופקי ואנכי\nבלאנק\nכרטיס ביקור מעוצב\nחתימת מייל (ללא הנפשה)' },
+    { id: 'm2', cat: 'מיתוג', name: 'חבילת מיתוג מורחבת (סטנדרט)', price: 5500, qty: false, bonus: false,
+      desc: 'אפיון קצר על בסיס שאלון להבנת הקונספט, הסגנון והצרכים\nאסטרטגיה\nלוגו מקצועי: 2 סקיצות + 2 סבבי תיקונים, גרסה אחת נוספת (שחור לבן / אנכי / אופקי)\nפלטת צבעים בסיסית\nכרטיס ביקור מעוצב\nשם לעסק\nחתימת מייל ותמונת פרופיל\n6 פריטי מיתוג לפי צורך העסק (למשל תפריטים)\nבלאנק' },
+    { id: 'm3', cat: 'מיתוג', name: 'חבילת מיתוג פרימיום', price: 11500, qty: false, bonus: false,
+      desc: 'כל מה שבחבילה המורחבת\n3 סקיצות + 3 סבבי תיקונים\nמדריך מיתוג (Brand Book)\nתבניות לרשתות חברתיות (סט 6)\nהנפשת לוגו\nמצגת עסקית ממותגת' },
+    { id: 'a1', cat: 'מיתוג', name: 'שם לעסק', price: 1200, qty: false, bonus: false, desc: 'הצעת שמות, בדיקת התאמה ופיתוח הקונספט' },
+    { id: 'a2', cat: 'מיתוג', name: 'סלוגן', price: 600, qty: false, bonus: false, desc: '' },
+    { id: 'a3', cat: 'מיתוג', name: 'פלטת צבעים וטיפוגרפיה', price: 800, qty: false, bonus: false, desc: 'בחירת צבעי מותג וגופנים, עם הוראות שימוש קצרות' },
+    { id: 'a4', cat: 'מיתוג', name: 'מדריך מיתוג (Brand Book)', price: 2400, qty: false, bonus: false, desc: 'לוגו, צבעים, גופנים, שימושים נכונים ושגויים. עד 12 עמודים' },
+    { id: 'a5', cat: 'מיתוג', name: 'כרטיס ביקור מעוצב', price: 600, qty: false, bonus: false, desc: '' },
+    { id: 'a6', cat: 'מיתוג', name: 'בלאנק (נייר מכתב)', price: 450, qty: false, bonus: false, desc: '' },
+    { id: 'a7', cat: 'מיתוג', name: 'חתימת מייל', price: 350, qty: false, bonus: false, desc: '' },
+    { id: 'a8', cat: 'מיתוג', name: 'תמונת פרופיל ועטיפה לרשתות', price: 400, qty: false, bonus: false, desc: '' },
+    { id: 'a10', cat: 'מיתוג', name: 'הנפשת לוגו', price: 1000, qty: false, bonus: false, desc: 'אנימציה קצרה של הלוגו, מתאימה לסטטוס ולסרטונים' },
+    { id: 'a11', cat: 'מיתוג', name: 'מדבקה / חותמת / תווית (לפריט)', price: 600, qty: true, bonus: false, desc: '' },
+    { id: 'a12', cat: 'מיתוג', name: 'תפריט (לתפריט)', price: 450, qty: true, bonus: false, desc: '' },
+    { id: 'a13', cat: 'מיתוג', name: 'פלייר / עלון / כרטיס מבצע (לפריט)', price: 900, qty: true, bonus: false, desc: '' },
+    { id: 'a14', cat: 'מיתוג', name: 'מצגת עסקית ממותגת (עד 12 שקפים)', price: 2800, qty: false, bonus: false, desc: '' },
+    { id: 'a15', cat: 'מיתוג', name: 'עיצוב אריזה / שקית (לפריט)', price: 1800, qty: true, bonus: false, desc: '' },
+    { id: 'a16', cat: 'מיתוג', name: 'שילוט / שלט חנות', price: 1800, qty: false, bonus: false, desc: '' },
+    { id: 'a9', cat: 'מיתוג', name: 'תבניות לרשתות חברתיות (סט 6)', price: 1800, qty: false, bonus: false, desc: 'סט תבניות ערוכות לפוסטים וסטוריז, בשפת המותג' },
+    { id: 'a17', cat: 'מיתוג', name: 'מודעת פרסום', price: 900, qty: true, bonus: false, desc: '' },
+    { id: 'r1', cat: 'רשתות חברתיות', name: 'ניהול עיצובי חודשי (8 פוסטים)', price: 2400, qty: true, bonus: false, desc: '8 פוסטים ממותגים בחודש. הכמות היא מספר החודשים' },
+    { id: 'r2', cat: 'רשתות חברתיות', name: 'פוסט בודד לרשתות', price: 300, qty: true, bonus: false, desc: '' },
+    { id: 'r3', cat: 'רשתות חברתיות', name: 'סטורי / ריל ממותג (לפריט)', price: 450, qty: true, bonus: false, desc: '' },
+    { id: 's1', cat: 'שמחות ואירועים', name: 'הזמנה לשמחה', price: 1200, qty: false, bonus: false, desc: 'עיצוב הזמנה אחת, גרסה להדפסה וגרסה דיגיטלית' },
+    { id: 's2', cat: 'שמחות ואירועים', name: 'סט עיצוב לשמחה', price: 3200, qty: false, bonus: false, desc: 'הזמנה\nכרטיס תודה / ברכה\nתפריט\nמספרי שולחנות\nשילוט בכניסה' },
+    { id: 's3', cat: 'שמחות ואירועים', name: 'גרסה נוספת של ההזמנה', price: 300, qty: true, bonus: false, desc: 'שינוי טקסט או שפה' },
+    { id: 's4', cat: 'שמחות ואירועים', name: 'בנטשר / ברכון בעיצוב אישי (עד 16 עמודים)', price: 2800, qty: false, bonus: false, desc: '' },
+    { id: 's5', cat: 'שמחות ואירועים', name: 'ספר שמחה / ספר מזכרת (עד 40 עמודים)', price: 5500, qty: false, bonus: false, desc: 'כריכה ועימוד פנים בעיצוב אישי' },
+    { id: 'e1', cat: 'שמחות ואירועים', name: 'לוגו לאירוע / טקס', price: 1800, qty: false, bonus: false, desc: '' },
+    { id: 'e2', cat: 'שמחות ואירועים', name: 'עיצוב מודעה (מחיר למודעה)', price: 750, qty: true, bonus: false, desc: '' },
+    { id: 'e3', cat: 'שמחות ואירועים', name: 'גריד למודעות', price: 800, qty: false, bonus: false, desc: '' },
+    { id: 'e4', cat: 'שמחות ואירועים', name: 'גריד עיצובי לאירוע', price: 650, qty: false, bonus: false,
+      desc: 'עיצוב הגריד בלבד: הזמנת כבוד, פתק מתנה, מודעת סטנדר, תפריט, מספר שולחן וכו׳' },
+    { id: 'e5', cat: 'שמחות ואירועים', name: 'מוצר נוסף על הגריד', price: 200, qty: true, bonus: false, desc: '' },
+    { id: 'e6', cat: 'שמחות ואירועים', name: 'שמשונית מאחורי האירוע', price: 850, qty: false, bonus: false, desc: '' },
+    { id: 's7', cat: 'שמחות ואירועים', name: 'פשקוויל / כרוז / מודעת קיר', price: 900, qty: false, bonus: false, desc: '' },
+    { id: 's12', cat: 'שמחות ואירועים', name: 'תעודת הוקרה / שטר הוקרה', price: 900, qty: false, bonus: false, desc: '' },
+    { id: 's13', cat: 'שמחות ואירועים', name: 'ערכת משלוח מנות / מתנה', price: 2400, qty: false, bonus: false, desc: 'מדבקה, תווית וכרטיס ברכה בעיצוב אחיד' },
+    { id: 's9', cat: 'שמחות ואירועים', name: 'לוח שנה שולחני (12 חודשים)', price: 3800, qty: false, bonus: false, desc: '' },
+    { id: 's10', cat: 'שמחות ואירועים', name: 'לוח שנה קיר', price: 4800, qty: false, bonus: false, desc: '' },
+    { id: 's11', cat: 'שמחות ואירועים', name: 'מגנט / כרטיס לוח שנה', price: 900, qty: false, bonus: false, desc: '' },
+    { id: 's15', cat: 'שמחות ואירועים', name: 'תבנית גיליון שבועי / עלון קהילה', price: 2000, qty: false, bonus: false, desc: 'עיצוב קבוע לגיליון שחוזר מדי שבוע' },
+    { id: 's16', cat: 'שמחות ואירועים', name: 'עימוד גיליון (לגיליון)', price: 450, qty: true, bonus: false, desc: '' },
+    { id: 'k1', cat: 'ספרים ועימוד', name: 'קונספט ועיצוב גריד לספר', price: 1800, qty: false, bonus: false, desc: 'בחירת גופנים, מבנה עמוד, כותרות והיררכיה' },
+    { id: 'k2', cat: 'ספרים ועימוד', name: 'עיצוב שער וכריכה (קדמית, שדרה, גב)', price: 2400, qty: false, bonus: false, desc: '' },
+    { id: 'k3', cat: 'ספרים ועימוד', name: 'עימוד עמוד טקסט (לעמוד)', price: 40, qty: true, bonus: false, desc: 'עימוד טקסט רציף עם כותרות והערות שוליים' },
+    { id: 'k4', cat: 'ספרים ועימוד', name: 'עימוד עמוד מעוצב (לעמוד)', price: 90, qty: true, bonus: false, desc: 'עמוד עם מסגרות, טבלאות, תמונות או איורים' },
+    { id: 'k6', cat: 'ספרים ועימוד', name: 'תוכן עניינים ואינדקס', price: 450, qty: false, bonus: false, desc: '' },
+    { id: 'k7', cat: 'ספרים ועימוד', name: 'הכנה לדפוס', price: 550, qty: false, bonus: false, desc: 'שוליים לחיתוך, CMYK, בדיקת רזולוציות וקובץ סופי לדפוס' },
+    { id: 'k8', cat: 'ספרים ועימוד', name: 'עיבוד תמונה / איור (ליחידה)', price: 40, qty: true, bonus: false, desc: '' },
+    { id: 'k11', cat: 'ספרים ועימוד', name: 'טבלה / תרשים מעוצב (ליחידה)', price: 150, qty: true, bonus: false, desc: '' },
+    { id: 'b1', cat: 'חוברות ותורמים', name: 'בסיס וגריד עיצובי', price: 800, qty: false, bonus: false,
+      desc: 'קונספט ויזואלי, פונטים, פלטת צבעים ואלמנטים קבועים (מסגרות, פסי כותרת ועמודים) לאורך כל החוברת' },
+    { id: 'b2', cat: 'חוברות ותורמים', name: 'עיצוב שער', price: 950, qty: false, bonus: false,
+      desc: 'שער מעוצב ברמה גבוהה, קומפוזיציה מרכזית וסידור היררכי של הכותרות' },
+    { id: 'b3', cat: 'חוברות ותורמים', name: 'עימוד עמוד פנים פרימיום (מחיר לעמוד)', price: 650, qty: true, bonus: false,
+      desc: 'עיצוב ועימוד עמוד פנים כולל שיבוץ תמונות וטקסטים' },
+    { id: 'b5', cat: 'חוברות ותורמים', name: 'עמוד סגירה ודרכי התקשרות', price: 450, qty: false, bonus: false, desc: '' },
+    { id: 'b6', cat: 'חוברות ותורמים', name: 'טבלת עלויות והקדשות', price: 850, qty: false, bonus: false, desc: 'טבלה מסודרת לתורמים, מסלולי 5/10 אברכים וכו׳' },
+    { id: 'b7', cat: 'חוברות ותורמים', name: 'כרטיס תורם / מעטפה', price: 800, qty: false, bonus: false, desc: '' },
+    { id: 'j1', cat: 'יומן ומוצר מודפס', name: 'מיתוג ושפה ויזואלית', price: 3500, qty: false, bonus: false,
+      desc: 'בניית קונספט עיצובי, בחירת פונטים ואלמנטים גרפיים ייחודיים שילוו לאורך המוצר' },
+    { id: 'j2', cat: 'יומן ומוצר מודפס', name: 'עיצוב כריכה', price: 1500, qty: false, bonus: false,
+      desc: 'כריכה קדמית, גב ושדרה. הכנה להשבחות דפוס' },
+    { id: 'j3', cat: 'יומן ומוצר מודפס', name: 'עימוד דפי פנים (עד 80 עמודים)', price: 3200, qty: false, bonus: false,
+      desc: 'עיצוב גריד פנימי מפורט, טבלאות מעקב, דפי השראה, לו"ז ועוד' },
+    { id: 'j4', cat: 'יומן ומוצר מודפס', name: 'סרטון שיווק קצר', price: 1100, qty: false, bonus: false,
+      desc: 'סרטון אווירה מונפש לסטטוס, המציג את המוצר ודפי הפנים בצורה חוויתית ומושכת' },
+    { id: 'j5', cat: 'יומן ומוצר מודפס', name: 'עיצוב מודעה', price: 1100, qty: false, bonus: true,
+      desc: 'מתנה בסגירת החבילה' },
+    { id: 'c1', cat: 'קמפיינים ופרסום', name: 'קמפיין: קונספט + 3 מודעות', price: 4800, qty: false, bonus: false,
+      desc: 'פיתוח קונספט ומסר מרכזי\nשלוש מודעות באותה שפה עיצובית\nהתאמה לגדלים נוספים' },
+    { id: 'c2', cat: 'קמפיינים ופרסום', name: 'מודעה קונספטואלית (עם עיבוד תמונה)', price: 1600, qty: true, bonus: false,
+      desc: 'רעיון מקורי, עיבוד תמונות והכנה לדפוס' },
+    { id: 'c3', cat: 'קמפיינים ופרסום', name: 'מודעה נוספת באותו קונספט', price: 750, qty: true, bonus: false, desc: '' },
+    { id: 'c4', cat: 'קמפיינים ופרסום', name: 'כרזה / פוסטר', price: 1400, qty: true, bonus: false, desc: '' },
+    { id: 'c5', cat: 'קמפיינים ופרסום', name: 'פלייר מתוך קונספט קיים', price: 650, qty: true, bonus: false, desc: '' },
+    { id: 'c6', cat: 'קמפיינים ופרסום', name: 'רטוש ועיבוד תמונת מוצר (ליחידה)', price: 150, qty: true, bonus: false, desc: '' },
+    { id: 'c7', cat: 'קמפיינים ופרסום', name: 'חוברת מבצעים / קטלוג מוצרים (לעמוד)', price: 450, qty: true, bonus: false, desc: '' },
+    { id: 't1', cat: 'עיצוב תורני', name: 'הזמנה למעמד / אירוע תורני', price: 1500, qty: false, bonus: false, desc: 'עיצוב ברמה גבוהה עם טיפוגרפיה ייחודית' },
+    { id: 't2', cat: 'עיצוב תורני', name: 'פשקוויל / מודעת קיר ברמה גבוהה', price: 1800, qty: false, bonus: false, desc: '' },
+    { id: 't3', cat: 'עיצוב תורני', name: 'כתב הוקרה / מכתב רבנים בעיצוב מסגרת', price: 2200, qty: false, bonus: false, desc: '' },
+    { id: 't4', cat: 'עיצוב תורני', name: 'לוגו למפעל / מבצע תורני', price: 3200, qty: false, bonus: false, desc: 'לוגו עם אות ייחודית, כולל גרסאות לשימוש' },
+    { id: 't5', cat: 'עיצוב תורני', name: 'סט שילוט לאולם / חנות / מבצע (עד 8 שלטים)', price: 3800, qty: false, bonus: false, desc: '' },
+    { id: 't6', cat: 'עיצוב תורני', name: 'תוויות ומדבקות מוצר (סט)', price: 1600, qty: false, bonus: false, desc: '' },
+    { id: 't7', cat: 'עיצוב תורני', name: 'כותרת מעוצבת ללוגו או שער (אות ייחודית)', price: 1200, qty: true, bonus: false, desc: '' },
+    { id: 'p1', cat: 'מצגות ותורמים', name: 'מצגת גיוס תורמים (עד 20 שקפים)', price: 7500, qty: false, bonus: false,
+      desc: 'שפה ויזואלית ייעודית לפרויקט\nמבנה סיפור: חזון, תוכנית, עלויות והזדמנויות הקדשה\nשקפי מסלולים וטבלאות עלות' },
+    { id: 'p2', cat: 'מצגות ותורמים', name: 'שקף נוסף במצגת', price: 350, qty: true, bonus: false, desc: '' },
+    { id: 'p3', cat: 'מצגות ותורמים', name: 'ספרון תורמים (עד 8 עמודים)', price: 5500, qty: false, bonus: false, desc: '' },
+    { id: 'p4', cat: 'מצגות ותורמים', name: 'מצגת הדרכה / הרצאה (עד 20 שקפים)', price: 4200, qty: false, bonus: false, desc: '' },
+    { id: 'x1', cat: 'תוספות', name: 'עבודה נוספת / סבב תיקונים נוסף (לשעה)', price: 150, qty: true, bonus: false, desc: '' },
+    { id: 'x2', cat: 'תוספות', name: 'פגישת ייעוץ עיצובי (לשעה)', price: 400, qty: true, bonus: false, desc: '' },
+    { id: 'x3', cat: 'תוספות', name: 'תוספת עבודה דחופה (עד 5 ימי עסקים)', price: 1000, qty: false, bonus: false, desc: '' },
+    { id: 'x4', cat: 'תוספות', name: 'סבב סקיצות נוסף', price: 800, qty: false, bonus: false, desc: '' }
+  ],
+  clauses: [
+    { id: 'c1', title: 'מקדמה', text: '{advance}% מסך הפרויקט ישולמו כדמי מקדמה עם אישור ההזמנה. יתרת התשלום תועבר עם סיום הפרויקט.' },
+    { id: 'c2', title: 'פורמט מסירה', text: 'העבודה תימסר בפורמט PDF סגור לדפוס ובפורמט JPG לאינטרנט.' },
+    { id: 'c3', title: 'חומרים מהלקוח', text: 'טקסטים יועברו לאחר הגהה בפורמט Word. תמונות ואלמנטים גרפיים יועברו בפורמט JPG / PNG / INDD / AI / PSD.' },
+    { id: 'c4', title: 'אחריות על תוכן', text: 'הגהות הן באחריות הלקוח בלבד! יש לבדוק היטב את הקבצים לפני האישור.' },
+    { id: 'c5', title: 'סקיצות ותיקונים', text: 'המחיר כולל עד {sketches} אופציות עיצוב (סקיצות) ועד {rounds} סבבי תיקונים על הסקיצה הנבחרת. כל סבב נוסף יחויב בתשלום שעתי. (סבב תיקונים = ריכוז של כל ההערות במייל אחד או בשיחה אחת).' },
+    { id: 'c6', title: 'זכויות יוצרים וחומרים', text: 'אחריות על רישיונות לשימוש בתמונות או סמלים שנמסרו מהלקוח חלה על הלקוח בלבד.' },
+    { id: 'c7', title: 'קניין רוחני', text: 'זכויות השימוש והקניין הרוחני שייכים למעצבת עד לגמר התשלום המלא. לאחר מכן, יועברו ללקוח זכויות השימוש בתוצר הסופי בלבד (לא כולל סקיצות שלא נבחרו).' },
+    { id: 'c8', title: 'ביטול עבודה', text: 'במקרה של ביטול עבודה מצד הלקוח לאחר תשלום המקדמה לא תוחזר המקדמה. במקרה של ביטול עבודה מצד הלקוח לאחר הגשת סקיצות / הצעות עיצוב ע"י המעצבת, יחויב הלקוח ב-{cancel}% נוספים (מלבד המקדמה) ממחיר כל העבודה שהוגשה כדמי סקיצות. דמי הסקיצות אינם מקנים זכות שימוש בעבודה.' },
+    { id: 'c9', title: 'שינויים לאחר סגירה', text: 'בקשות לשינויים לאחר אישור סופי ומסירת קבצים יחויבו לפי תעריף של {hourly} ₪ לשעה.' },
+    { id: 'c10', title: 'תוקף הצעה', text: 'המחיר תקף {validity} מיום הגשת ההצעה.' },
+    { id: 'c11', title: 'לוחות זמנים', text: 'עיכוב מצד הלקוח במתן תשובות עלול לדחות את מועד המסירה הסופי.' },
+    { id: 'c12', title: 'אחריות לאחר אישור סופי', text: 'לאחר אישור סופי, הסטודיו לא יישא באחריות על טעויות כתיב, צבע או גרפיקה שיתגלו לאחר ההדפסה.' },
+    { id: 'c13', title: 'תיק עבודות', text: 'המעצבת רשאית להציג את העבודה / סקיצות בתיק העבודות שלה (דיגיטלי או מודפס). אין בכך משום התחייבות לפרסום שכזה.' },
+    { id: 'c14', title: 'קבצים פתוחים', text: 'לא יימסרו קבצים פתוחים.' },
+    { id: 'c15', title: 'הדפסה וקרדיט', text: 'השירות אינו כולל הדפסה. קרדיט הסטודיו יופיע בצידו של כל פרויקט.' },
+    { id: 'c16', title: 'קבצים סופיים לדפוס', text: 'יועברו ללקוח לאחר העברת התשלום במלואו.' },
+    { id: 'c17', title: '', text: 'חתימה על מסמך זה מהווה התחייבות לתשלום עפ"י התנאים הנ"ל.' }
+  ]
+};
+
+const TEMPLATES = [
+  { id: 'logo', group: 'מיתוג', name: 'לוגו בלבד', noun: 'לוגו', title: 'עיצוב לוגו', deadline: '10 ימי עסקים', items: { m0: 1 } },
+  { id: 'brand1', group: 'מיתוג', name: 'מיתוג בסיסי', noun: 'מיתוג', title: 'מיתוג', deadline: '15 ימי עסקים', items: { m1: 1 } },
+  { id: 'brand2', group: 'מיתוג', name: 'מיתוג מורחב (סטנדרט)', noun: 'מיתוג', title: 'חבילת מיתוג מורחבת', deadline: '15 ימי עסקים', items: { m2: 1 } },
+  { id: 'brand3', group: 'מיתוג', name: 'מיתוג פרימיום', noun: 'מיתוג', title: 'חבילת מיתוג פרימיום', deadline: '25 ימי עסקים', items: { m3: 1 } },
+  { id: 'start', group: 'מיתוג', name: 'עסק חדש: מיתוג + רשתות', noun: 'מיתוג', title: 'מיתוג ורשתות חברתיות לעסק חדש', deadline: '20 ימי עסקים', items: { m2: 1, a9: 1, a10: 1 }, discPct: 8 },
+  { id: 'inst', group: 'מיתוג', name: 'מוסד / עמותה', noun: 'מיתוג', title: 'מיתוג למוסד', deadline: '25 ימי עסקים', items: { m2: 1, a4: 1, a14: 1 }, discPct: 5 },
+  { id: 'social', group: 'מיתוג', name: 'רשתות חברתיות (3 חודשים)', noun: 'עיצוב', title: 'ניהול עיצובי לרשתות חברתיות', deadline: 'מתחילים מיד', items: { r1: 3 }, discPct: 5 },
+  { id: 'simcha1', group: 'שמחות ואירועים', name: 'הזמנה לשמחה', noun: 'עיצוב', title: 'עיצוב הזמנה לשמחה', deadline: '7 ימי עסקים', items: { s1: 1 } },
+  { id: 'simcha2', group: 'שמחות ואירועים', name: 'סט שמחה + ברכון', noun: 'עיצוב', title: 'עיצוב לשמחה', deadline: '15 ימי עסקים', items: { s2: 1, s4: 1 }, discPct: 5 },
+  { id: 'simcha3', group: 'שמחות ואירועים', name: 'ספר שמחה / מזכרת', noun: 'עיצוב', title: 'עיצוב ספר שמחה', deadline: '20 ימי עסקים', items: { s5: 1, k7: 1 } },
+  { id: 'event', group: 'שמחות ואירועים', name: 'אירוע וטקס', noun: 'עיצוב', title: 'עיצוב ומיתוג לאירוע', deadline: 'יתואם מול הלקוח', items: { e1: 1, e3: 1, e4: 1, e6: 1, e2: 3 } },
+  { id: 'eventS', group: 'שמחות ואירועים', name: 'אירוע קטן (גריד בלבד)', noun: 'עיצוב', title: 'עיצוב גריד לאירוע', deadline: '10 ימי עסקים', items: { e4: 1, e5: 3, e6: 1 } },
+  { id: 'honor', group: 'שמחות ואירועים', name: 'טקס והוקרה', noun: 'עיצוב', title: 'עיצוב לטקס הוקרה', deadline: 'יתואם מול הלקוח', items: { e1: 1, s12: 1, e4: 1, e6: 1 } },
+  { id: 'cal', group: 'שמחות ואירועים', name: 'לוח שנה שולחני + מגנט', noun: 'עיצוב', title: 'עיצוב לוח שנה', deadline: '20 ימי עסקים', items: { s9: 1, s11: 1 } },
+  { id: 'weekly', group: 'שמחות ואירועים', name: 'גיליון שבועי (חודש)', noun: 'עימוד', title: 'עיצוב ועימוד גיליון שבועי', deadline: 'מתחילים מיד', items: { s15: 1, s16: 4 } },
+  { id: 'booklet', group: 'חוברות וספרים', name: 'חוברת תורמים', noun: 'עימוד', title: 'עיצוב ועימוד חוברת לתורמים', deadline: 'יתואם מול הלקוח', items: { b1: 1, b2: 1, b3: 7 } },
+  { id: 'booklet2', group: 'חוברות וספרים', name: 'חוברת תורמים מלאה', noun: 'עימוד', title: 'עיצוב ועימוד חוברת לתורמים', deadline: 'יתואם מול הלקוח', items: { b1: 1, b2: 1, b3: 10, b5: 1, b6: 1 } },
+  { id: 'book1', group: 'חוברות וספרים', name: 'ספר: עימוד טקסט (200 עמ׳)', noun: 'עימוד', title: 'עיצוב ועימוד ספר', deadline: '30 ימי עסקים', items: { k1: 1, k2: 1, k3: 200, k6: 1, k7: 1 }, discPct: 5 },
+  { id: 'book2', group: 'חוברות וספרים', name: 'ספר מעוצב (120 עמ׳)', noun: 'עימוד', title: 'עיצוב ועימוד ספר מעוצב', deadline: '40 ימי עסקים', items: { k1: 1, k2: 1, k4: 120, k6: 1, k7: 1 }, discPct: 5 },
+  { id: 'haggada', group: 'חוברות וספרים', name: 'הגדה / ספר חג', noun: 'עימוד', title: 'עיצוב ועימוד ספר חג', deadline: '40 ימי עסקים', items: { k1: 1, k2: 1, k4: 60, k8: 20, k7: 1 } },
+  { id: 'diary', group: 'חוברות וספרים', name: 'יומן / מוצר מודפס', noun: 'עיצוב', title: 'מיתוג, עיצוב והפקת יומן', deadline: '25 ימי עסקים', items: { j1: 1, j2: 1, j3: 1, j4: 1, j5: 1 } },
+  { id: 'camp', group: 'שיווק וגיוס', name: 'קמפיין פרסום', noun: 'עיצוב', title: 'קמפיין פרסום', deadline: '20 ימי עסקים', items: { c1: 1, c6: 3 } },
+  { id: 'ad1', group: 'שיווק וגיוס', name: 'מודעה קונספטואלית', noun: 'עיצוב', title: 'עיצוב מודעה', deadline: '7 ימי עסקים', items: { c2: 1 } },
+  { id: 'deck', group: 'שיווק וגיוס', name: 'מצגת גיוס תורמים', noun: 'עיצוב', title: 'עיצוב מצגת לגיוס תורמים', deadline: '20 ימי עסקים', items: { p1: 1 } },
+  { id: 'donor', group: 'שיווק וגיוס', name: 'ערכת גיוס תורמים', noun: 'עיצוב', title: 'ערכת גיוס תורמים', deadline: '35 ימי עסקים', items: { p1: 1, p3: 1, b7: 1 }, discPct: 7 },
+  { id: 'proj', group: 'שיווק וגיוס', name: 'מבצע תורני (לוגו + שילוט)', noun: 'עיצוב', title: 'עיצוב מבצע תורני', deadline: '25 ימי עסקים', items: { t4: 1, t2: 1, t5: 1, t6: 1 }, discPct: 5 },
+  { id: 'sale', group: 'שיווק וגיוס', name: 'חוברת מבצעים (16 עמ׳)', noun: 'עימוד', title: 'עיצוב חוברת מבצעים', deadline: '20 ימי עסקים', items: { b1: 1, b2: 1, c7: 16, c6: 10 } },
+  { id: 'free', group: 'חופשי', name: 'פרויקט חופשי', noun: 'עיצוב', title: '', deadline: 'יתואם מול הלקוח', items: {} }
+];
+
+const CATEGORY_OPTIONS = ['עיצוב', 'עימוד', 'מיתוג', 'לוגו', 'עיצוב ועימוד', 'ליווי גרפי'];
+const QSTYLES = [['list', 'רשימה'], ['table', 'טבלה'], ['inclusive', 'חבילה אחת'], ['tiers', 'שלוש אפשרויות']];
+const TIERSETS = [
+  { id: 'brand', name: 'מיתוג', title: 'מיתוג', tiers: [['בסיס', ['m1']], ['סטנדרט', ['m2'], 1], ['פרימיום', ['m3']]] },
+  { id: 'simcha', name: 'שמחה', title: 'עיצוב לשמחה', tiers: [['הזמנה', ['s1']], ['סט שמחה', ['s2'], 1], ['סט + ברכון', ['s2', 's4']]] },
+  { id: 'donor', name: 'חוברת תורמים', title: 'חוברת לתורמים', tiers: [['מצומצמת', ['b1', 'b2', 'b3:4', 'b5']], ['מלאה', ['b1', 'b2', 'b3:8', 'b5', 'b6'], 1], ['יוקרתית', ['b1', 'b2', 'b3:14', 'b5', 'b6', 'b7']]] },
+  { id: 'camp', name: 'פרסום', title: 'פרסום', tiers: [['מודעה', ['c2']], ['קמפיין', ['c1'], 1], ['קמפיין + המשך', ['c1', 'c3:4', 'c6:6']]] },
+  { id: 'book', name: 'ספר', title: 'עיצוב ועימוד ספר', tiers: [['100 עמודים', ['k1', 'k2', 'k3:100', 'k7']], ['200 עמודים', ['k1', 'k2', 'k3:200', 'k6', 'k7'], 1], ['300 עמודים', ['k1', 'k2', 'k3:300', 'k6', 'k7']]] },
+  { id: 'deck', name: 'גיוס כספים', title: 'גיוס תורמים', tiers: [['מצגת', ['p1']], ['מצגת + ספרון', ['p1', 'p3'], 1], ['ערכה מלאה', ['p1', 'p3', 'b7', 'c2']]] }
+];
+
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const num = v => { const n = parseFloat(String(v).replace(/,/g, '')); return isFinite(n) ? n : 0; };
+const money = n => '₪ ' + Math.round(n).toLocaleString('en-US');
+const todayISO = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const dmy = iso => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '.' + m[2] + '.' + m[1] : ''; };
+const weeksText = n => n === 1 ? 'לשבוע' : n === 2 ? 'לשבועיים' : 'ל-' + n + ' שבועות';
+const tplOf = id => TEMPLATES.find(t => t.id === id) || TEMPLATES[TEMPLATES.length - 1];
+
+function fillText(t, P, d) {
+  const adv = d && d.advance != null ? d.advance : P.advance;
+  return String(t)
+    .replace(/\{advance\}/g, adv).replace(/\{sketches\}/g, P.sketches).replace(/\{rounds\}/g, P.rounds)
+    .replace(/\{hourly\}/g, P.hourly).replace(/\{cancel\}/g, P.cancel).replace(/\{validity\}/g, weeksText(P.validity));
+}
+
+function calc(d, S) {
+  const lines = [];
+  let sub = 0;
+  S.services.forEach(s => {
+    const sel = d.sel[s.id];
+    if (!sel || !sel.on) return;
+    const price = sel.price != null && sel.price !== '' ? num(sel.price) : s.price;
+    const qty = s.qty ? Math.max(1, num(sel.qty || 1)) : 1;
+    const total = price * qty;
+    lines.push({ name: s.name, desc: s.desc, qty: s.qty ? qty : 1, unit: price, total, bonus: !!s.bonus });
+    if (!s.bonus) sub += total;
+  });
+  (d.custom || []).forEach(c => {
+    if (!c.name && !num(c.price)) return;
+    const p = num(c.price);
+    lines.push({ name: c.name || 'שירות נוסף', desc: '', qty: 1, unit: p, total: p, bonus: false });
+    sub += p;
+  });
+  const discount = Math.min(sub, Math.max(0, num(d.discount)));
+  const net = sub - discount;
+  const vat = d.vat ? net * (S.params.vatRate / 100) : 0;
+  const total = net + vat;
+  const advPct = d.advance != null ? num(d.advance) : S.params.advance;
+  const advance = Math.round(total * advPct / 100);
+  return { lines, sub, discount, vat, total, advPct, advance, balance: total - advance };
+}
+
+function tierData(d, S) {
+  const set = TIERSETS.find(x => x.id === d.tierSet) || TIERSETS[0];
+  const tiers = set.tiers.map(t => {
+    const lines = [];
+    let total = 0;
+    t[1].forEach(ref => {
+      const p = ref.split(':'), s = S.services.find(x => x.id === p[0]); if (!s) return;
+      const q = p[1] ? +p[1] : 1, tt = s.price * q;
+      lines.push({ name: s.name + (q > 1 ? ' × ' + q : ''), desc: s.desc, total: tt }); total += tt;
+    });
+    return { name: t[0], rec: !!t[2], lines, total };
+  });
+  return { set, tiers };
+}
+
+function lineAmt(l) {
+  return l.bonus ? '<span>מתנה!</span><small>בשווי ' + money(l.total) + '</small>'
+    : money(l.total) + (l.qty > 1 ? '<small>' + l.qty + ' × ' + money(l.unit) + '</small>' : '');
+}
+
+function quoteBody(d, S, c) {
+  const st = d.style || 'list';
+  if (st === 'tiers') {
+    const td = tierData(d, S);
+    return '<div class="d-tiers">' + td.tiers.map(t => '<div class="d-tier' + (t.rec ? ' rec' : '') + '">' + (t.rec ? '<div class="rb">מומלץ</div>' : '') +
+      '<div class="tn">' + esc(t.name) + '</div><ul>' + t.lines.map(l => '<li>' + esc(l.name) + '</li>').join('') + '</ul>' +
+      '<div class="tp">' + money(t.total) + '</div></div>').join('') + '</div>' +
+      '<div class="d-note">בוחרים אפשרות אחת ומאשרים בחתימה. אפשר לשלב ולהתאים כל אפשרות לצורך.</div>';
+  }
+  if (!c.lines.length) return '<div class="d-note">עוד לא נבחרו שירותים.</div>';
+  if (st === 'table') {
+    return '<table class="d-tbl"><thead><tr><th>שלב העבודה</th><th>תיאור השירות</th><th>עלות</th></tr></thead><tbody>' +
+      c.lines.map(l => '<tr class="' + (l.bonus ? 'gift' : '') + '"><td class="n">' + (l.bonus ? 'בונוס מתנה! ' : '') + esc(l.name) + '</td><td>' + esc(l.desc).replace(/\n/g, '<br>') +
+        '</td><td class="a">' + lineAmt(l) + '</td></tr>').join('') + '</tbody></table>';
+  }
+  if (st === 'inclusive') {
+    return '<ul class="d-inc">' + c.lines.map(l => '<li><b>' + esc(l.name) + (l.qty > 1 ? ' × ' + l.qty : '') + '</b>' +
+      (l.desc ? '<ul>' + l.desc.split('\n').map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') + '</li>').join('') + '</ul>';
+  }
+  return c.lines.map(l => '<div class="d-row' + (l.bonus ? ' d-gift' : '') + '"><div><div class="d-nm">' + (l.bonus ? 'בונוס מתנה! ' : '') + esc(l.name) + '</div>' +
+    (l.desc ? '<div class="d-ds">' + esc(l.desc) + '</div>' : '') + '</div><div class="d-amt">' + lineAmt(l) + '</div></div>').join('');
+}
+
+function docHtml(d, S) {
+  const st = S.studio, T = tplOf(d.tpl), c = calc(d, S);
+  const isQ = d.type !== 'contract', isC = d.type !== 'quote';
+  const docName = d.type === 'quote' ? 'הצעת מחיר' : d.type === 'contract' ? 'חוזה עבודה' : 'הצעת מחיר וחוזה עבודה';
+  const catWord = (d.category && String(d.category).trim()) ? String(d.category).trim() : T.noun;
+  const lead = d.type === 'contract'
+    ? 'מצו"ב חוזה עבודה, שגם אתם תצאו <u>מרוצים</u> <b>' + esc(st.hebName) + '!</b>'
+    : 'מצו"ב ' + docName + ' כבקשתך,<br>כדי שגם לך יהיה <u>' + esc(catWord) + '</u> <b>' + esc(st.hebName) + '!</b>';
+  let who = '';
+  if (d.client) who += '<div><b>לכבוד:</b> ' + esc(d.client) + '</div>';
+  if (d.date) who += '<div><b>תאריך:</b> ' + esc(dmy(d.date)) + '</div>';
+  if (d.type === 'contract') who = '<div><b>ברוכים הבאים לסטודיו,</b></div><div><b>שמחים שנכנסת אלינו:)</b></div>' + (d.client ? '<div style="margin-top:6px"><b>לכבוד:</b> ' + esc(d.client) + '</div>' : '');
+
+  let h = '<div class="paper"><div class="d-head"><div class="d-wm">' + esc(st.name) + '</div><div class="d-bar"></div>' +
+    '<div class="d-bsd">בסיעתא דשמיא</div><div class="d-to"><div class="who">' + who + '</div><div class="ld">' + lead + '</div></div></div>';
+
+  const title = d.project || T.title;
+  if (isQ) {
+    h += '<div class="d-ttl">הצעת מחיר עבור' + (title ? '<br>' + esc(title) : '') + '</div>';
+    h += '<div class="d-boxw"><div class="d-tab"><span>הצעת <em>מחיר</em></span></div>' +
+      '<div class="d-tab2">' + (d.style === 'tiers' ? 'החל מ-<b>' + money(Math.min.apply(null, tierData(d, S).tiers.map(t => t.total))) + '</b>' : 'לתשלום:<b>' + money(c.total) + '</b>') + '</div><div class="d-box">';
+    h += quoteBody(d, S, c);
+    if (d.style === 'tiers') {
+      h += (d.deadline ? '<div class="d-note"><b>דד ליין:</b> ' + esc(d.deadline) + '</div>' : '') +
+           (d.notes ? '<div class="d-note">' + esc(d.notes) + '</div>' : '') +
+           '<div class="d-sign">בברכת הצלחה וסייעתא דשמיא,<br><b>' + esc(st.hebName) + '.</b></div></div></div>';
+    } else {
+      h += '<div class="d-sum">';
+      if (c.discount || c.vat) h += '<div><span>סכום ביניים</span><span>' + money(c.sub) + '</span></div>';
+      if (c.discount) h += '<div><span>הנחה</span><span>-' + money(c.discount) + '</span></div>';
+      if (c.vat) h += '<div><span>מע"מ ' + S.params.vatRate + '%</span><span>' + money(c.vat) + '</span></div>';
+      h += '<div class="tt"><span>סה"כ לתשלום</span><span>' + money(c.total) + '</span></div>';
+      if (c.advPct > 0 && c.total > 0) h += '<div><span>מקדמה (' + c.advPct + '%) עם אישור ההזמנה</span><span>' + money(c.advance) + '</span></div>' +
+        '<div><span>יתרה עם סיום הפרויקט</span><span>' + money(c.balance) + '</span></div>';
+      h += '</div>';
+      if (d.deadline) h += '<div class="d-note"><b>דד ליין:</b> ' + esc(d.deadline) + '</div>';
+      if (d.notes) h += '<div class="d-note">' + esc(d.notes) + '</div>';
+      h += '<div class="d-sign">בברכת הצלחה וסייעתא דשמיא,<br><b>' + esc(st.hebName) + '.</b></div></div></div>';
+    }
+  }
+
+  if (isC) {
+    h += '<div class="d-intro">אנא קראו בעיון את החוזה, בכדי למנוע אי הבנות או עוגמת נפש.</div>';
+    h += '<div class="d-boxw"><div class="d-tab"><span>חוזה <em>עבודה</em></span></div><div class="d-box">';
+    S.clauses.forEach(cl => {
+      if ((d.off || []).indexOf(cl.id) > -1) return;
+      const tx = esc(fillText(cl.text, S.params, d));
+      h += '<p class="d-cl" style="margin-top:0">' + (cl.title ? '<b>' + esc(cl.title) + ':</b> ' : '') + tx + '</p>';
+    });
+    h += '<div class="d-gl">שיהיה לנו בהצלחה:)</div><div class="d-sg">' +
+      '<div>שם הלקוח: <span>' + esc(d.client) + '</span></div><div>טל: <span>' + esc(d.phone) + '</span></div>' +
+      '<div>תאריך החוזה: <span>' + esc(dmy(d.date)) + '</span></div><div>שולמה מקדמה ע"ס: <span></span></div>' +
+      '<div>חתימת הלקוח: <span></span></div><div>חתימת המעצבת: <span></span></div></div></div></div>';
+  }
+
+  h += '<div class="d-tag">' + esc(st.tag1) + '<br>' + esc(st.tag2) + '</div>';
+  h += '<div class="d-foot"><div class="lg">' + esc(st.name) + '</div><div class="ph"><b>' + esc(st.phone) + '</b><small>' + esc(st.email) + '</small></div>' +
+    '<div class="ct">' + esc(st.cta) + ' <b>' + esc(st.ctaEm) + '</b></div></div>';
+  if (st.bank) h += '<div class="d-bank">פרטי הבנק לתשלום: ' + esc(st.bank) + '</div>';
+  return h + '</div>';
+}
+
+function docText(d, S) {
+  const c = calc(d, S), T = tplOf(d.tpl), L = [];
+  const name = d.type === 'contract' ? 'חוזה עבודה' : d.type === 'quote' ? 'הצעת מחיר' : 'הצעת מחיר וחוזה עבודה';
+  L.push('בסיעתא דשמיא', name + (d.project || T.title ? ' – ' + (d.project || T.title) : ''));
+  if (d.client) L.push('לכבוד: ' + d.client);
+  if (d.date) L.push('תאריך: ' + dmy(d.date));
+  if (d.type !== 'contract' && d.style === 'tiers') {
+    L.push('');
+    tierData(d, S).tiers.forEach(t => L.push('• ' + t.name + (t.rec ? ' (מומלץ)' : '') + ': ' + t.lines.map(l => l.name).join(', ') + ' – ' + money(t.total)));
+    if (d.deadline) L.push('דד ליין: ' + d.deadline);
+  } else if (d.type !== 'contract') {
+    L.push('');
+    c.lines.forEach(l => L.push('• ' + l.name + (l.qty > 1 ? ' (' + l.qty + ' × ' + money(l.unit) + ')' : '') + ' – ' + (l.bonus ? 'מתנה (בשווי ' + money(l.total) + ')' : money(l.total))));
+    if (c.discount) L.push('הנחה: -' + money(c.discount));
+    if (c.vat) L.push('מע"מ: ' + money(c.vat));
+    L.push('סה"כ לתשלום: ' + money(c.total));
+    if (c.advPct > 0 && c.total > 0) L.push('מקדמה (' + c.advPct + '%): ' + money(c.advance) + ' | יתרה: ' + money(c.balance));
+    if (d.deadline) L.push('דד ליין: ' + d.deadline);
+  }
+  if (d.type !== 'quote') {
+    L.push('', 'תנאי העבודה:');
+    S.clauses.forEach(cl => { if ((d.off || []).indexOf(cl.id) < 0) L.push('• ' + (cl.title ? cl.title + ': ' : '') + fillText(cl.text, S.params, d)); });
+  }
+  L.push('', S.studio.hebName + ' | ' + S.studio.phone);
+  if (S.studio.bank && d.type !== 'contract') L.push('פרטי הבנק: ' + S.studio.bank);
+  return L.join('\n');
+}
+
+const lsGet = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } };
+
+const Store = {
+  async getSettings() { return lsGet('pf_settings'); },
+  async setSettings(s) { lsSet('pf_settings', s); },
+  async list() { return lsGet('pf_docs') || []; },
+  async save(rec) {
+    const all = lsGet('pf_docs') || [], i = all.findIndex(x => x.id === rec.id);
+    if (i > -1) all[i] = rec; else all.push(rec);
+    lsSet('pf_docs', all);
+  },
+  async remove(id) {
+    lsSet('pf_docs', (lsGet('pf_docs') || []).filter(x => x.id !== id));
+  }
+};
+
+let S = clone(DEFAULTS);
+let D = null;
+let saveTimer = null;
+
+function newDraft(tplId) {
+  const T = tplOf(tplId || 'brand1');
+  const d = {
+    id: null, type: 'both', tpl: T.id, category: T.noun, style: 'list', tierSet: 'brand',
+    client: '', phone: '', email: '', project: '', date: todayISO(), deadline: T.deadline,
+    sel: {}, custom: [], discount: 0, advance: S.params.advance, vat: false, notes: '', off: []
+  };
+  Object.keys(T.items).forEach(k => { d.sel[k] = { on: true, qty: T.items[k] }; });
+  pkgDiscount(d, T);
+  return d;
+}
+function pkgDiscount(d, T) {
+  d.discount = 0;
+  if (T.discPct) d.discount = Math.round(calc(d, S).sub * T.discPct / 100 / 10) * 10;
+}
+function applyTemplate(id) {
+  const T = tplOf(id);
+  D.tpl = id;
+  D.category = T.noun;
+  D.deadline = T.deadline;
+  D.sel = {};
+  Object.keys(T.items).forEach(k => { D.sel[k] = { on: true, qty: T.items[k] }; });
+  pkgDiscount(D, T);
+}
+function queueSettingsSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { Store.setSettings(S); }, 600);
+}
+function toast(msg) {
+  const t = $('#toast'); t.firstElementChild.textContent = msg; t.classList.add('on');
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2400);
+}
+function setStatus(m) { const e = $('#pvStatus'); if (e) e.textContent = m || ''; }
+
+const TYPES = [['both', 'הצעה + חוזה'], ['quote', 'הצעת מחיר'], ['contract', 'חוזה']];
+
+function formHtml() {
+  const curCat = D.category != null ? D.category : tplOf(D.tpl).noun;
+  let h = '<div class="card"><h3><i>1</i>סוג המסמך</h3><div class="seg" id="typeSeg">' +
+    TYPES.map(t => '<button data-type="' + t[0] + '" aria-pressed="' + (D.type === t[0]) + '">' + t[1] + '</button>').join('') + '</div></div>';
+  const groups = [];
+  TEMPLATES.forEach(t => { if (groups.indexOf(t.group) < 0) groups.push(t.group); });
+  h += '<div class="card"><h3><i>2</i>חבילה</h3><div id="tplSeg">' + groups.map(g => '<div class="grp" style="margin-top:8px">' + esc(g) + '</div><div class="seg">' +
+    TEMPLATES.filter(t => t.group === g).map(t => '<button data-tpl="' + t.id + '" aria-pressed="' + (D.tpl === t[0]) + '">' + esc(t.name) + '</button>').join('') + '</div>').join('') + '</div>' +
+    '<div class="note">החבילה מסמנת מראש את השירותים והמחירים. אפשר לשנות כל שורה אחרי.</div></div>';
+  h += '<div class="card"><h3><i>3</i>פרטי הלקוח וקטגוריה לכותרת</h3><div class="grid2">' +
+    '<label class="f">שם הלקוח<input type="text" id="f_client" data-k="client" value="' + esc(D.client) + '"></label>' +
+    '<label class="f">טלפון<input type="tel" id="f_phone" data-k="phone" value="' + esc(D.phone) + '"></label>' +
+    '<label class="f w2">מילה / קטגוריה לכותרת ("כדי שגם לך יהיה ___ פרפקט")' +
+      '<div class="seg" id="catSeg" style="margin-bottom:6px">' +
+      CATEGORY_OPTIONS.map(c => '<button type="button" data-cat="' + esc(c) + '" aria-pressed="' + (curCat === c) + '">' + esc(c) + '</button>').join('') + '</div>' +
+      '<input type="text" id="f_category" data-k="category" placeholder="בחרו למעלה או מלאו חופשית (למשל: מיתוג, עימוד, עיצוב)" value="' + esc(curCat) + '">' +
+    '</label>' +
+    '<label class="f w2">שם הפרויקט (מופיע בכותרת)<input type="text" id="f_project" data-k="project" placeholder="' + esc(tplOf(D.tpl).title) + '" value="' + esc(D.project) + '"></label>' +
+    '<label class="f">תאריך<input type="date" id="f_date" data-k="date" value="' + esc(D.date) + '"></label>' +
+    '<label class="f">דד ליין<input type="text" id="f_deadline" data-k="deadline" value="' + esc(D.deadline) + '"></label>' +
+    '</div></div>';
+  h += '<div class="card"><h3><i>4</i>סגנון ההצעה</h3><div class="seg" id="styleSeg">' +
+    QSTYLES.map(t => '<button data-style="' + t[0] + '" aria-pressed="' + ((D.style || 'list') === t[0]) + '">' + t[1] + '</button>').join('') + '</div>' +
+    '<div id="tierPick" style="margin-top:10px"' + (D.style === 'tiers' ? '' : ' hidden') + '><div class="grp" style="margin-top:0">סוג שלוש האפשרויות</div><div class="seg" id="tierSeg">' +
+    TIERSETS.map(t => '<button data-tier="' + t.id + '" aria-pressed="' + (D.tierSet === t.id) + '">' + esc(t.name) + '</button>').join('') + '</div>' +
+    '<div class="note">המחירים נלקחים מהמחירון. לעריכה: לשונית "מחירון".</div></div></div>';
+  h += '<div class="card" id="svcCard"' + (D.style === 'tiers' ? ' hidden' : '') + '><h3><i>5</i>שירותים ומחירים</h3><div id="svcBox"></div>' +
+    '<div class="grp">שורות מותאמות</div><div id="customBox"></div><button class="btn sm" id="addCustom" type="button">+ הוספת שורה</button>' +
+    '<div class="grid2" style="margin-top:14px">' +
+    '<label class="f">הנחה (₪)<input type="number" id="f_discount" data-k="discount" min="0" value="' + esc(D.discount || '') + '"></label>' +
+    '<label class="f">מקדמה (%)<input type="number" id="f_advance" data-k="advance" min="0" max="100" value="' + esc(D.advance) + '"></label>' +
+    '<label class="f w2" style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)"><input type="checkbox" id="f_vat" data-k="vat"' + (D.vat ? ' checked' : '') + '> הוספת מע"מ ' + S.params.vatRate + '% למחיר</label>' +
+    '<label class="f w2">הערות להצעה (אופציונלי)<textarea id="f_notes" data-k="notes">' + esc(D.notes) + '</textarea></label></div>' +
+    '<div class="sum" id="sumBox"></div></div>';
+  h += '<div class="card"><h3><i>6</i>סעיפי התקנון במסמך</h3><div id="clBox"></div>' +
+    '<div class="note">עריכת הנוסח עצמו נעשית בלשונית "תקנון".</div></div>';
+  h += '<div class="row" style="margin-bottom:30px"><button class="btn pri" id="saveBtn" type="button">שמירה ללקוחות שלי</button>' +
+    '<button class="btn" id="newBtn" type="button">מסמך חדש</button></div>';
+  return h;
+}
+
+function svcHtml() {
+  const cats = [];
+  S.services.forEach(s => { if (cats.indexOf(s.cat) < 0) cats.push(s.cat); });
+  let h = '';
+  cats.forEach(cat => {
+    h += '<div class="grp">' + esc(cat) + '</div>';
+    S.services.filter(s => s.cat === cat).forEach(s => {
+      const sel = D.sel[s.id] || { on: false };
+      const price = sel.price != null && sel.price !== '' ? sel.price : s.price;
+      h += '<div class="svc' + (sel.on ? '' : ' off') + '" data-id="' + s.id + '"><input type="checkbox" class="on" aria-label="' + esc(s.name) + '"' + (sel.on ? ' checked' : '') + '>' +
+        '<div class="nm">' + esc(s.name) + (s.bonus ? ' <small>(מתנה)</small>' : '') + '</div><div class="nums">' +
+        (s.qty ? '<input type="number" class="q" min="1" aria-label="כמות" value="' + esc(sel.qty || 1) + '">' : '') +
+        '<input type="number" class="p" min="0" aria-label="מחיר" value="' + esc(price) + '"></div>' +
+        (s.desc ? '<div class="ds">' + esc(s.desc.split('\n').slice(0, 2).join(' · ')) + '</div>' : '') + '</div>';
+    });
+  });
+  return h;
+}
+function customHtml() {
+  if (!D.custom.length) return '<div class="note" style="margin:0 0 8px">אפשר להוסיף שירות שלא נמצא במחירון.</div>';
+  return D.custom.map((c, i) => '<div class="row" style="margin-bottom:6px;flex-wrap:nowrap" data-i="' + i + '">' +
+    '<input type="text" class="cn" placeholder="שם השירות" aria-label="שם השירות" value="' + esc(c.name) + '">' +
+    '<input type="number" class="cp" style="width:96px;direction:ltr" min="0" aria-label="מחיר" value="' + esc(c.price || '') + '">' +
+    '<button class="btn sm bad cx" type="button" aria-label="מחיקת שורה">✕</button></div>').join('');
+}
+function clauseListHtml() {
+  return S.clauses.map(cl => '<label class="row" style="padding:5px 0;border-top:1px solid var(--line);cursor:pointer"><input type="checkbox" data-cl="' + cl.id + '"' +
+    ((D.off || []).indexOf(cl.id) < 0 ? ' checked' : '') + '><span>' + esc(cl.title || 'סעיף סיום') + '</span></label>').join('');
+}
+function sumHtml() {
+  const c = calc(D, S);
+  let h = '';
+  if (c.discount || c.vat) h += '<div class="r"><span>סכום ביניים</span><span>' + money(c.sub) + '</span></div>';
+  if (c.discount) h += '<div class="r"><span>הנחה</span><span>-' + money(c.discount) + '</span></div>';
+  if (c.vat) h += '<div class="r"><span>מע"מ</span><span>' + money(c.vat) + '</span></div>';
+  h += '<div class="r t"><span>סה"כ לתשלום</span><b>' + money(c.total) + '</b></div>';
+  h += '<div class="r"><span>מקדמה (' + c.advPct + '%)</span><span>' + money(c.advance) + '</span></div><div class="r"><span>יתרה</span><span>' + money(c.balance) + '</span></div>';
+  return h;
+}
+
+function fitPreview() {
+  const pv = $('#pv'), inner = $('#pvInner'), sizer = $('#pvSizer');
+  if (!pv || !inner || !pv.clientWidth) return;
+  const s = Math.min(1, pv.clientWidth / 794);
+  inner.style.transform = 'scale(' + s + ')';
+  sizer.style.height = Math.ceil(inner.offsetHeight * s) + 'px';
+}
+function renderPreview() {
+  $('#pvInner').innerHTML = docHtml(D, S);
+  fitPreview();
+}
+function refreshSum() { const b = $('#sumBox'); if (b) b.innerHTML = sumHtml(); renderPreview(); persistDraft(); }
+function persistDraft() { lsSet('pf_draft', D); }
+
+const TYPE_NAME = { both: 'הצעה + חוזה', quote: 'הצעת מחיר', contract: 'חוזה' };
+
+async function renderSaved() {
+  const box = $('#tab-saved');
+  box.innerHTML = '<h2>הלקוחות שלי</h2><p class="lead">כל מסמך ששמרת. פותחים, מעדכנים ומורידים שוב.</p><div id="savedList" class="note">טוען…</div>';
+  const list = (await Store.list()).sort((a, b) => (b.saved || 0) - (a.saved || 0));
+  const el = $('#savedList');
+  if (!list.length) { el.className = 'empty'; el.textContent = 'עוד לא נשמרו מסמכים. אחרי שממלאים מסמך, לוחצים "שמירה ללקוחות שלי".'; return; }
+  el.className = 'scroll-x';
+  el.innerHTML = '<table class="tbl"><thead><tr><th>לקוח</th><th>פרויקט</th><th>סוג</th><th>תאריך</th><th>סה"כ</th><th></th></tr></thead><tbody>' +
+    list.map(r => '<tr data-id="' + esc(r.id) + '"><td><b>' + esc(r.d.client || 'ללא שם') + '</b></td><td>' + esc(r.d.project || tplOf(r.d.tpl).title) + '</td><td>' + TYPE_NAME[r.d.type] +
+      '</td><td>' + esc(dmy(r.d.date)) + '</td><td>' + money(calc(r.d, S).total) + '</td><td><div class="row"><button class="btn sm op" type="button">פתיחה</button>' +
+      '<button class="btn sm bad rm" type="button">מחיקה</button></div></td></tr>').join('') + '</tbody></table>';
+  el._list = list;
+}
+
+function renderPrices() {
+  const cats = [];
+  S.services.forEach(s => { if (cats.indexOf(s.cat) < 0) cats.push(s.cat); });
+  let h = '<h2>מחירון</h2><p class="lead">כל מה שמופיע כאן זמין כשירות במסמך החדש. אפשר לערוך מחירים, לשנות תיאורים ולהוסיף שירותים.</p>' +
+    '<input type="text" id="svcSearch" placeholder="חיפוש במחירון" aria-label="חיפוש במחירון" style="max-width:320px;margin-bottom:14px"><datalist id="catList">' + cats.map(c => '<option value="' + esc(c) + '">').join('') + '</datalist>';
+  h += S.services.map(s => '<div class="card" data-id="' + s.id + '"><div class="grid2">' +
+    '<label class="f">שם השירות<input type="text" data-f="name" value="' + esc(s.name) + '"></label>' +
+    '<label class="f">מחיר (₪)<input type="number" min="0" data-f="price" value="' + esc(s.price) + '"></label>' +
+    '<label class="f">קטגוריה<input type="text" list="catList" data-f="cat" value="' + esc(s.cat) + '"></label>' +
+    '<div class="row" style="align-self:end;gap:14px"><label class="row"><input type="checkbox" data-f="qty"' + (s.qty ? ' checked' : '') + '> לפי כמות</label>' +
+    '<label class="row"><input type="checkbox" data-f="bonus"' + (s.bonus ? ' checked' : '') + '> מתנה</label></div>' +
+    '<label class="f w2">תיאור (שורה לכל פריט)<textarea data-f="desc">' + esc(s.desc) + '</textarea></label></div>' +
+    '<div class="row" style="margin-top:8px"><button class="btn sm bad rm" type="button">מחיקת שירות</button></div></div>').join('');
+  h += '<div class="row" style="margin-bottom:30px"><button class="btn pri" id="addSvc" type="button">+ שירות חדש</button><button class="btn" id="resetSvc" type="button">החזרת מחירון המקור</button></div>';
+  $('#tab-prices').innerHTML = h;
+}
+
+function renderTerms() {
+  const P = S.params;
+  const pf = [['advance', 'מקדמה (%)'], ['sketches', 'מספר סקיצות'], ['rounds', 'סבבי תיקונים'], ['hourly', 'תעריף שעתי (₪)'], ['cancel', 'דמי סקיצות בביטול (%)'], ['validity', 'תוקף הצעה (שבועות)'], ['vatRate', 'מע"מ (%)']];
+  let h = '<h2>תקנון</h2><p class="lead">הנוסח של החוזה שלך. המספרים נכנסים לסעיפים אוטומטית, ואפשר לערוך כל סעיף.</p>' +
+    '<div class="card"><h3>ערכים קבועים</h3><div class="grid2">' +
+    pf.map(f => '<label class="f">' + f[1] + '<input type="number" min="0" data-p="' + f[0] + '" value="' + esc(P[f[0]]) + '"></label>').join('') + '</div></div>';
+  h += S.clauses.map((c, i) => '<div class="card cl" data-i="' + i + '" style="border-top:1px solid var(--line)"><div class="hd"><input type="text" data-c="title" placeholder="כותרת הסעיף" value="' + esc(c.title) + '">' +
+    '<button class="btn sm up" type="button" aria-label="הזזה למעלה">↑</button><button class="btn sm dn" type="button" aria-label="הזזה למטה">↓</button></div>' +
+    '<textarea data-c="text">' + esc(c.text) + '</textarea><div class="row"><button class="btn sm bad rm" type="button">מחיקת סעיף</button></div></div>').join('');
+  h += '<div class="note">בטקסט אפשר להשתמש ב: {advance} {sketches} {rounds} {hourly} {cancel} {validity}</div>' +
+    '<div class="row" style="margin:12px 0 30px"><button class="btn pri" id="addCl" type="button">+ סעיף חדש</button><button class="btn" id="resetCl" type="button">החזרת התקנון המקורי</button></div>';
+  $('#tab-terms').innerHTML = h;
+}
+
+function renderStudio() {
+  const st = S.studio;
+  const f = [['name', 'שם המותג (לוגו)'], ['hebName', 'שם בעברית'], ['owner', 'שם המעצבת'], ['phone', 'טלפון'], ['email', 'אימייל'], ['bank', 'פרטי בנק'], ['tag1', 'שורת סיום 1'], ['tag2', 'שורת סיום 2'], ['cta', 'משפט בכותרת התחתונה'], ['ctaEm', 'מילה מודגשת בצהוב']];
+  $('#tab-studio').innerHTML = '<h2>פרטי הסטודיו</h2><p class="lead">הפרטים שמופיעים בכותרת ובתחתית של כל מסמך.</p><div class="card"><div class="grid2">' +
+    f.map(x => '<label class="f' + (x[0] === 'bank' || x[0] === 'cta' ? ' w2' : '') + '">' + x[1] + '<input type="text" data-s="' + x[0] + '" value="' + esc(st[x[0]]) + '"></label>').join('') +
+    '</div></div><div class="note">ההגדרות והמסמכים נשמרים בדפדפן הזה.</div>';
+}
+
+async function copyText(txt) {
+  try { await navigator.clipboard.writeText(txt); toast('הטקסט הועתק'); return; } catch (e) { }
+  const ta = document.createElement('textarea'); ta.value = txt; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select();
+  let ok = false; try { ok = document.execCommand('copy'); } catch (e) { }
+  ta.remove(); toast(ok ? 'הטקסט הועתק' : 'ההעתקה לא נתמכת כאן');
+}
+
+function triggerBlobDownload(filename, blobOrStr, mime) {
+  const blob = blobOrStr instanceof Blob ? blobOrStr : new Blob([blobOrStr], { type: mime || 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 250);
+}
+
+function docFileSlug() {
+  const slug = todayISO() + (D.client ? '-' + D.client.trim().replace(/[^\u0590-\u05FFa-zA-Z0-9]+/g, '-').slice(0, 24) : '');
+  const prefix = D.type === 'quote' ? 'quote' : D.type === 'contract' ? 'contract' : 'proposal';
+  return 'perfect-' + prefix + '-' + slug;
+}
+
+/* יצירת קובץ PDF אחד ארוך הרציף לכל המסמך */
+async function renderLongSinglePdfBlob() {
+  const host = document.createElement('div');
+  host.id = 'pdfHost';
+  host.style.cssText = 'position:fixed;left:0;top:0;width:794px;opacity:0;pointer-events:none;z-index:-1';
+  host.innerHTML = docHtml(D, S);
+  document.body.appendChild(host);
+  try {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    await new Promise(r => setTimeout(r, 80));
+    const paper = host.firstElementChild;
+    const W = 794;
+    const totalPx = Math.max(1123, paper.offsetHeight);
+    const SC = 2;
+
+    const cv = await html2canvas(paper, {
+      scale: SC,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false,
+      width: W,
+      height: totalPx,
+      windowWidth: W,
+      onclone: doc => {
+        const h = doc.getElementById('pdfHost');
+        if (h) h.style.opacity = '1';
+      }
+    });
+
+    const pdfWidthPt = 595.28;
+    const pdfHeightPt = (totalPx / W) * pdfWidthPt;
+    const pdf = new window.jspdf.jsPDF({
+      unit: 'pt',
+      format: [pdfWidthPt, pdfHeightPt],
+      orientation: 'portrait'
+    });
+
+    pdf.addImage(cv.toDataURL('image/jpeg', 0.94), 'JPEG', 0, 0, pdfWidthPt, pdfHeightPt);
+    return pdf.output('blob');
+  } finally {
+    host.remove();
+  }
+}
+
+async function downloadLongPdf() {
+  const btn = $('#pdfBtn');
+  const old = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'מכין PDF ארוך…'; }
+  setStatus('מכין קובץ PDF רציף אחד…');
+  try {
+    if (window.html2canvas && window.jspdf) {
+      const blob = await renderLongSinglePdfBlob();
+      triggerBlobDownload(docFileSlug() + '.pdf', blob, 'application/pdf');
+      setStatus('קובץ ה-PDF הארוך ירד למחשב');
+      toast('קובץ ה-PDF הארוך הורד בהצלחה');
+    } else {
+      setStatus('ספריית ה-PDF לא נטענה – פותח חלון הדפסה');
+      window.print();
+    }
+  } catch (e) {
+    setStatus('שגיאה ביצירת ה-PDF – נפתח חלון הדפסה');
+    toast('פותח חלון הדפסה');
+    window.print();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = old || 'הורדה כ-PDF'; }
+  }
+}
+
+async function saveDoc() {
+  if (!D.client) { toast('כדאי להזין שם לקוח לפני שמירה'); $('#f_client').focus(); return; }
+  if (!D.id) D.id = 'c_' + Date.now().toString(36);
+  await Store.save({ id: D.id, saved: Date.now(), d: clone(D) });
+  persistDraft(); toast('נשמר ברשימת הלקוחות');
+}
+
+function pvBarHtml() {
+  return '<button class="btn pri" id="pdfBtn" type="button">הורדה כ-PDF</button>' +
+         '<button class="btn" id="cpBtn" type="button">העתקת טקסט (וואטסאפ / מייל)</button>';
+}
+
+function buildDocTab() {
+  $('#form').innerHTML = formHtml();
+  $('#svcBox').innerHTML = svcHtml();
+  $('#customBox').innerHTML = customHtml();
+  $('#clBox').innerHTML = clauseListHtml();
+  $('#pvbar').innerHTML = pvBarHtml();
+  $('#sumBox').innerHTML = sumHtml();
+  $('#clBox').parentElement.style.display = D.type === 'quote' ? 'none' : '';
+  renderPreview();
+}
+
+function showTab(name) {
+  $$('#tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+  $$('.tab').forEach(t => { t.hidden = t.id !== 'tab-' + name; });
+  if (name === 'doc') { buildDocTab(); }
+  if (name === 'saved') renderSaved();
+  if (name === 'prices') renderPrices();
+  if (name === 'terms') renderTerms();
+  if (name === 'studio') renderStudio();
+  window.scrollTo(0, 0);
+}
+
+function arm(btn, label, fn) {
+  if (btn.dataset.arm) { fn(); return; }
+  btn.dataset.arm = '1'; const old = btn.textContent; btn.textContent = label;
+  setTimeout(() => { if (btn.isConnected) { delete btn.dataset.arm; btn.textContent = old; } }, 3000);
+}
+const setBool = (c, v) => c.setAttribute('aria-pressed', String(v));
+
+$('#tabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (b) showTab(b.dataset.tab); });
+$('#mview').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]'); if (!b) return;
+  $('#shell').classList.toggle('show-pv', b.dataset.v === 'view');
+  $$('#mview button').forEach(x => x.classList.toggle('pri', x === b));
+  if (b.dataset.v === 'view') setTimeout(fitPreview, 30);
+});
+
+const form = $('#form');
+form.addEventListener('click', e => {
+  const t = e.target;
+  const ty = t.closest('#typeSeg button');
+  if (ty) {
+    D.type = ty.dataset.type; $$('#typeSeg button').forEach(b => setBool(b, b === ty));
+    $('#clBox').parentElement.style.display = D.type === 'quote' ? 'none' : ''; refreshSum(); return;
+  }
+  const catBtn = t.closest('#catSeg button');
+  if (catBtn) {
+    const val = catBtn.dataset.cat;
+    D.category = val;
+    const inp = $('#f_category');
+    if (inp) inp.value = val;
+    $$('#catSeg button').forEach(b => setBool(b, b === catBtn));
+    refreshSum(); return;
+  }
+  const sty = t.closest('#styleSeg button');
+  if (sty) {
+    D.style = sty.dataset.style; $$('#styleSeg button').forEach(b => setBool(b, b === sty));
+    $('#tierPick').hidden = D.style !== 'tiers'; $('#svcCard').hidden = D.style === 'tiers'; refreshSum(); return;
+  }
+  const tr = t.closest('#tierSeg button');
+  if (tr) { D.tierSet = tr.dataset.tier; $$('#tierSeg button').forEach(b => setBool(b, b === tr)); refreshSum(); return; }
+  const tp = t.closest('#tplSeg button');
+  if (tp) { applyTemplate(tp.dataset.tpl); buildDocTab(); persistDraft(); return; }
+  if (t.closest('#addCustom')) { D.custom.push({ name: '', price: 0 }); $('#customBox').innerHTML = customHtml(); refreshSum(); return; }
+  const cx = t.closest('.cx');
+  if (cx) { D.custom.splice(+cx.closest('[data-i]').dataset.i, 1); $('#customBox').innerHTML = customHtml(); refreshSum(); return; }
+  if (t.closest('#saveBtn')) { saveDoc(); return; }
+  if (t.closest('#newBtn')) { D = newDraft(D.tpl); buildDocTab(); persistDraft(); toast('מסמך חדש'); }
+});
+
+form.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.k) {
+    const k = t.dataset.k;
+    D[k] = t.type === 'checkbox' ? t.checked : t.value;
+    if (k === 'category') {
+      $$('#catSeg button').forEach(b => setBool(b, b.dataset.cat === D.category));
+    }
+    refreshSum(); return;
+  }
+  if (t.dataset.cl) {
+    const off = new Set(D.off || []);
+    if (t.checked) off.delete(t.dataset.cl); else off.add(t.dataset.cl);
+    D.off = Array.from(off); refreshSum(); return;
+  }
+  const row = t.closest('.svc');
+  if (row) {
+    const id = row.dataset.id; const sel = D.sel[id] || (D.sel[id] = { on: false });
+    if (t.classList.contains('on')) { sel.on = t.checked; row.classList.toggle('off', !t.checked); }
+    else if (t.classList.contains('q')) sel.qty = t.value;
+    else if (t.classList.contains('p')) sel.price = t.value;
+    refreshSum(); return;
+  }
+  const cr = t.closest('#customBox [data-i]');
+  if (cr) {
+    const c = D.custom[+cr.dataset.i];
+    if (t.classList.contains('cn')) c.name = t.value; else if (t.classList.contains('cp')) c.price = t.value;
+    refreshSum();
+  }
+});
+
+$('#pvbar').addEventListener('click', e => {
+  if (e.target.closest('#pdfBtn')) downloadLongPdf();
+  if (e.target.closest('#cpBtn')) copyText(docText(D, S));
+});
+
+$('#tab-saved').addEventListener('click', e => {
+  const tr = e.target.closest('tr[data-id]'); if (!tr) return;
+  const list = $('#savedList')._list || [], rec = list.find(r => r.id === tr.dataset.id);
+  if (e.target.closest('.op') && rec) { D = clone(rec.d); D.id = rec.id; showTab('doc'); persistDraft(); }
+  const rm = e.target.closest('.rm');
+  if (rm) arm(rm, 'לאישור המחיקה', async () => { await Store.remove(tr.dataset.id); toast('נמחק'); renderSaved(); });
+});
+
+const prices = $('#tab-prices');
+function onPriceInput(e) {
+  const t = e.target, card = t.closest('.card[data-id]'); if (!card || !t.dataset.f) return;
+  const s = S.services.find(x => x.id === card.dataset.id); if (!s) return;
+  const f = t.dataset.f;
+  s[f] = (f === 'qty' || f === 'bonus') ? t.checked : f === 'price' ? num(t.value) : t.value;
+  queueSettingsSave();
+}
+prices.addEventListener('input', e => {
+  if (e.target.id === 'svcSearch') {
+    const q = e.target.value.trim().toLowerCase();
+    $$('#tab-prices .card[data-id]').forEach(c => { const s = S.services.find(x => x.id === c.dataset.id); c.hidden = !!q && !((s.name + ' ' + s.cat + ' ' + s.desc).toLowerCase().includes(q)); });
+    return;
+  }
+  onPriceInput(e);
+});
+prices.addEventListener('click', e => {
+  const t = e.target;
+  const rm = t.closest('.rm');
+  if (rm) arm(rm, 'לאישור המחיקה', () => { S.services = S.services.filter(x => x.id !== rm.closest('.card').dataset.id); queueSettingsSave(); renderPrices(); });
+  if (t.closest('#addSvc')) { S.services.push({ id: 'u' + Date.now().toString(36), cat: 'כללי', name: 'שירות חדש', price: 0, qty: false, bonus: false, desc: '' }); queueSettingsSave(); renderPrices(); window.scrollTo(0, document.body.scrollHeight); }
+  const rs = t.closest('#resetSvc');
+  if (rs) arm(rs, 'לאישור האיפוס', () => { S.services = clone(DEFAULTS.services); queueSettingsSave(); renderPrices(); toast('המחירון חזר להגדרות המקור'); });
+});
+
+const terms = $('#tab-terms');
+terms.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.p) { S.params[t.dataset.p] = num(t.value); queueSettingsSave(); return; }
+  const card = t.closest('.cl[data-i]');
+  if (card && t.dataset.c) { S.clauses[+card.dataset.i][t.dataset.c] = t.value; queueSettingsSave(); }
+});
+terms.addEventListener('click', e => {
+  const t = e.target, card = t.closest('.cl[data-i]'), i = card ? +card.dataset.i : -1;
+  const swap = j => { if (j < 0 || j >= S.clauses.length) return; const x = S.clauses[i]; S.clauses[i] = S.clauses[j]; S.clauses[j] = x; queueSettingsSave(); renderTerms(); };
+  if (t.closest('.up')) swap(i - 1);
+  if (t.closest('.dn')) swap(i + 1);
+  const rm = t.closest('.rm');
+  if (rm) arm(rm, 'לאישור המחיקה', () => { S.clauses.splice(i, 1); queueSettingsSave(); renderTerms(); });
+  if (t.closest('#addCl')) { S.clauses.push({ id: 'u' + Date.now().toString(36), title: '', text: '' }); queueSettingsSave(); renderTerms(); window.scrollTo(0, document.body.scrollHeight); }
+  const rs = t.closest('#resetCl');
+  if (rs) arm(rs, 'לאישור האיפוס', () => { S.clauses = clone(DEFAULTS.clauses); S.params = clone(DEFAULTS.params); queueSettingsSave(); renderTerms(); toast('התקנון חזר לנוסח המקור'); });
+});
+
+$('#tab-studio').addEventListener('input', e => {
+  const k = e.target.dataset.s;
+  if (k) { S.studio[k] = e.target.value; queueSettingsSave(); }
+});
+
+if (window.ResizeObserver) new ResizeObserver(fitPreview).observe($('#pv'));
+window.addEventListener('resize', fitPreview);
+
+(function start() {
+  const saved = lsGet('pf_settings');
+  if (saved) {
+    S = Object.assign(clone(DEFAULTS), saved);
+    S.studio = Object.assign({}, DEFAULTS.studio, saved.studio || {});
+    S.params = Object.assign({}, DEFAULTS.params, saved.params || {});
+  }
+  D = lsGet('pf_draft') || newDraft('brand1');
+  if (!D.sel || !D.custom || !D.off) D = newDraft('brand1');
+  if (D.category == null) D.category = tplOf(D.tpl).noun;
+  showTab('doc');
+})();
+</script>
+</body>
+</html>
